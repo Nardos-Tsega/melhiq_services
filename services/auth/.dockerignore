@@ -1,0 +1,30 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+#host
+venv/
+
+# VCS & editor junk
+.git/
+.gitignore
+.gitattributes
+.idea/
+.vscode/
+.DS_Store
+
+# Local env & secrets
+.env
+.env.*
+*.pem
+*.key
+
+# OS / misc
+Thumbs.db

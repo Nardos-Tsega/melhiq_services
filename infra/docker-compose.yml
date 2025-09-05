@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  # ---- api gateway ----
+  nginx:
+    image: nginx:1.17
+    container_name: gateway
+    ports: ["8000:8000"]
+    volumes:
+      - ../gateway/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      auth:
+        condition: service_healthy
+      claims:
+        condition: service_healthy
+
+  # ---- auth service ----
+  auth:
+    build:
+      context: ../services/auth
+    container_name: auth
+    expose: ["8001:8000"]
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_URLS=http://+:5000
+    #   - ConnectionStrings__DefaultConnection=Host=postgres;Database=authdb;Username=postgres;Password=yourpassword
+    #   - Jwt__Key=your_jwt_secret_key
+    #   - Jwt__Issuer=your_issuer
+    # depends_on:
+    #   - postgres
+    healthcheck:
+      test: [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; \
+          resp=urllib.request.urlopen('http://localhost:8000/healthz', timeout=2); \
+          sys.exit(0) if resp.status < 400 else sys.exit(1)",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+  # ---- claims service ----
+  claims:
+    build:
+      context: ../services/claims
+    container_name: claims
+    expose: ["8002:8000"]
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_URLS=http://+:5000
+    #   - ConnectionStrings__DefaultConnection=Host=postgres;Database=claimsdb;Username=postgres;Password=yourpassword
+    # depends_on:
+    #   - postgres
+    healthcheck:
+      test: [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; \
+          resp=urllib.request.urlopen('http://localhost:8000/healthz', timeout=2); \
+          sys.exit(0) if resp.status < 400 else sys.exit(1)",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  # ---- postgres ----
