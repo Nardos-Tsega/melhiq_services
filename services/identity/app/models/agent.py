@@ -1,9 +1,9 @@
 from app.db.base import Base
 
-class Role(Base):
-    __tablename__ = "roles"
+class Agent(Base):
+    __tablename__ = "agents"
 
     id: int
     name: str
-    description: str
+    email: str
     is_active: bool
