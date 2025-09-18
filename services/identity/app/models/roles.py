@@ -1,9 +1,0 @@
-from app.db.base import Base
-
-class Role(Base):
-    __tablename__ = "roles"
-
-    id: int
-    name: str
-    description: str
-    is_active: bool

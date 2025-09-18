@@ -1,11 +1,12 @@
 from logging.config import fileConfig
-import asyncio
+import asyncio, importlib, pkgutil
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.db.base import Base
 from app.config.settings import get_settings
+import app.models as models_pkg
+from app.db.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,6 +16,11 @@ config = context.config
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+    
+for _finder, modname, _ispkg in pkgutil.walk_packages(
+    models_pkg.__path__, models_pkg.__name__ + "."
+):
+    importlib.import_module(modname)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -81,4 +87,4 @@ async def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    asyncio.run(run_migrations_online())
